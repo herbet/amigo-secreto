@@ -54,23 +54,24 @@ class ParticipantController extends BaseController
              exit;
          }
  
-         $participant_id = $_POST['id'] ?? null;
+         // Dados recebidos do formulário
+         $participant_id = $_POST['participant_id'] ?? null;
          $group_id = $_POST['group_id'] ?? null;
-         $name = $_POST['name'] ?? '';
-         $email = $_POST['email'] ?? '';
+         $name = trim($_POST['name'] ?? '');
+         $email = trim($_POST['email'] ?? '');
  
          if (!$participant_id || !$group_id || empty($name) || empty($email)) {
              self::showError("Todos os campos são obrigatórios.");
-             exit;
          }
  
-         $participant = Participant::findById($participant_id);
-         if (!$participant) {
-             self::showError("Participante não encontrado.");
-             exit;
-         }
+         // Verificar se o e-mail pertence a um usuário já cadastrado
+         $user = User::findByEmail($email);
+         $user_id = $user ? $user['id'] : null;
  
-         Participant::updateParticipant($participant_id, $name, $email);
+         // Atualizar o participante
+         Participant::updateParticipant($participant_id, $name, $email, $user_id);
+ 
+         // Redirecionar para a página de configurações do grupo
          header("Location: /group/$group_id/settings");
          exit;
      }
