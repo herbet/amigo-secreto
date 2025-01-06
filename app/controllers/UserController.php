@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../models/User.php';
+require_once __DIR__ . '/../models/Participant.php';
 require_once __DIR__ . '/../models/Group.php';
 require_once __DIR__ . '/BaseController.php';
 
@@ -95,6 +96,13 @@ class UserController extends BaseController
         }
 
         $user_id = User::create($name, $email, $password);
+
+        // Verificar se o e-mail já existe na tabela `participants`
+        $participant = Participant::findByEmail($email);
+        if ($participant) {
+            // Relacionar o participante ao novo usuário criado
+            Participant::updateUserId($participant['id'], $user_id);
+        }
 
         // Login automático após registro
         $_SESSION['user_id'] = $user_id;

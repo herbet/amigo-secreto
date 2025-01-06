@@ -80,6 +80,18 @@ class Participant
         $stmt->execute([$name, $email, $user_id, $participant_id]);
     }
 
+    // Atualizar o user_id de um participante
+    public static function updateUserId($participant_id, $user_id)
+    {
+        $pdo = Database::connect();
+        $stmt = $pdo->prepare("
+            UPDATE `participants`
+            SET user_id = ?
+            WHERE id = ?
+        ");
+        $stmt->execute([$user_id, $participant_id]);
+    }    
+
     // Excluir participante do grupo
     public static function deleteFromGroup($participant_id, $group_id)
     {
