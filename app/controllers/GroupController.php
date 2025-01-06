@@ -159,30 +159,51 @@ class GroupController extends BaseController
             exit;
         }
 
+        $participants = Participant::getMembers($group_id);
+
+        if (count($participants) < 2) {
+            self::showError("É necessário pelo menos 2 participantes para realizar o sorteio.");
+        }
+
         // Verificar se o sorteio já foi realizado
         if ($group['draw_completed']) {
             self::showError("O sorteio já foi realizado.");
             exit;
         }
 
-        // Realizar o sorteio
-        $participants = Group::getMembers($group_id);
-        if (count($participants) < 2) {
-            self::showError("É necessário pelo menos dois participantes para realizar o sorteio.");
-            exit;
+        // Embaralhar a lista de participantes utilizando mt_rand()
+        $shuffled_participants = $participants;
+        usort($shuffled_participants, function () {
+            return mt_rand(-1, 1);
+        });
+    
+        // Validar se o sorteio é válido (ninguém tirou a si mesmo)
+        $max_attempts = 100;
+        $attempt = 0;
+        $valid_draw = false;
+    
+        while (!$valid_draw && $attempt < $max_attempts) {
+            $attempt++;
+            usort($shuffled_participants, function () {
+                return mt_rand(-1, 1);
+            });
+    
+            $valid_draw = true;
+            foreach ($participants as $index => $participant) {
+                if ($participant['id'] === $shuffled_participants[$index]['id']) {
+                    $valid_draw = false;
+                    break;
+                }
+            }
         }
-
-        // Embaralhar os participantes
-        $ids = array_column($participants, 'id');
-        $shuffled_ids = $ids;
-        do {
-            shuffle($shuffled_ids);
-        } while (!Group::isValidDraw($ids, $shuffled_ids));
-
-        // Associar os amigos secretos
-        foreach ($ids as $index => $participant_id) {
-            $secret_friend_id = $shuffled_ids[$index];
-            Group::setSecretFriend($participant_id, $secret_friend_id);
+    
+        if (!$valid_draw) {
+            self::showError("Não foi possível realizar um sorteio válido. Tente novamente.");
+        }
+    
+        // Salvar o sorteio no banco de dados
+        foreach ($participants as $index => $participant) {
+            Participant::setSecretFriend($participant['id'], $shuffled_participants[$index]['id']);
         }
 
         // Marcar o sorteio como concluído
