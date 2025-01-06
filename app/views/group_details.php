@@ -34,7 +34,9 @@
     <h3 class="mt-4">Participantes</h3>
     <ul class="list-group">
         <?php foreach (Group::getMembers($group['id']) as $participant): ?>
-            <li class="list-group-item"><?= htmlspecialchars($participant['name']) ?></li>
+            <li class="list-group-item">
+            <?= htmlspecialchars($participant['name']) ?> (<?= htmlspecialchars($participant['email']) ?>)
+            </li>
         <?php endforeach; ?>
     </ul>
 
