@@ -35,7 +35,7 @@
         <div id="edit-form" style="display: none;" class="mb-3">
             <h3>Editar Participante</h3>
             <form action="/participant/edit" method="POST">
-                <input type="hidden" name="id" id="edit-id">
+                <input type="hidden" name="participant_id" id="edit-id">
                 <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
 
                 <!-- Nome -->
