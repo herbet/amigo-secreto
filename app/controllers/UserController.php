@@ -191,6 +191,9 @@ class UserController extends BaseController
         // Atualizar a sessão com o novo nome
         $_SESSION['user_name'] = $name;
 
+        // Definir mensagem de sucesso na sessão
+        $_SESSION['success_message'] = "Perfil atualizado com sucesso!";        
+
         header("Location: /profile");
         exit;
     }

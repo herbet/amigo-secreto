@@ -2,6 +2,14 @@
 
 <h2>Meu Perfil</h2>
 
+<!-- Exibir mensagem de sucesso, se existir -->
+<?php if (!empty($_SESSION['success_message'])): ?>
+    <div class="alert alert-success" role="alert">
+        <?= htmlspecialchars($_SESSION['success_message']) ?>
+    </div>
+    <?php unset($_SESSION['success_message']); ?>
+<?php endif; ?>
+
 <form action="/profile" method="POST">
     <!-- Nome -->
     <div class="mb-3">
