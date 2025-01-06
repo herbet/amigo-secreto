@@ -31,9 +31,7 @@ CREATE TABLE `group_members` (
     group_id INT NOT NULL,
     participant_id INT NOT NULL,
     secret_friend_id INT DEFAULT NULL,
-    FOREIGN KEY (group_id) REFERENCES groups(id),
+    FOREIGN KEY (group_id) REFERENCES `groups`(id),
     FOREIGN KEY (participant_id) REFERENCES participants(id),
     FOREIGN KEY (secret_friend_id) REFERENCES participants(id)
 );
-
-
