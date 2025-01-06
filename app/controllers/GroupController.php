@@ -1,7 +1,6 @@
 <?php
 
 require_once __DIR__ . '/../models/Group.php';
-require_once __DIR__ . '/../models/Participant.php';
 require_once __DIR__ . '/BaseController.php';
 
 class GroupController extends BaseController
@@ -159,15 +158,17 @@ class GroupController extends BaseController
             exit;
         }
 
-        $participants = Participant::getMembers($group_id);
-
-        if (count($participants) < 2) {
-            self::showError("É necessário pelo menos 2 participantes para realizar o sorteio.");
-        }
-
         // Verificar se o sorteio já foi realizado
         if ($group['draw_completed']) {
             self::showError("O sorteio já foi realizado.");
+            exit;
+        }
+
+        // Realizar o sorteio
+        $participants = Group::getMembers($group_id);
+        
+        if (count($participants) < 2) {
+            self::showError("É necessário pelo menos dois participantes para realizar o sorteio.");
             exit;
         }
 
@@ -176,18 +177,18 @@ class GroupController extends BaseController
         usort($shuffled_participants, function () {
             return mt_rand(-1, 1);
         });
-    
+
         // Validar se o sorteio é válido (ninguém tirou a si mesmo)
         $max_attempts = 100;
         $attempt = 0;
         $valid_draw = false;
-    
+
         while (!$valid_draw && $attempt < $max_attempts) {
             $attempt++;
             usort($shuffled_participants, function () {
                 return mt_rand(-1, 1);
             });
-    
+
             $valid_draw = true;
             foreach ($participants as $index => $participant) {
                 if ($participant['id'] === $shuffled_participants[$index]['id']) {
@@ -196,14 +197,14 @@ class GroupController extends BaseController
                 }
             }
         }
-    
+
         if (!$valid_draw) {
             self::showError("Não foi possível realizar um sorteio válido. Tente novamente.");
         }
-    
+
         // Salvar o sorteio no banco de dados
         foreach ($participants as $index => $participant) {
-            Participant::setSecretFriend($participant['id'], $shuffled_participants[$index]['id']);
+            Group::setSecretFriend($participant['id'], $shuffled_participants[$index]['id']);
         }
 
         // Marcar o sorteio como concluído
