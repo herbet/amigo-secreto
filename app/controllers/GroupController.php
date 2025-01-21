@@ -41,6 +41,13 @@ class GroupController extends BaseController
 
         $user_id = $_SESSION['user_id'];
 
+        // Busca informações do usuário
+        $email = User::findById($user_id)['email'];
+        if (!$email) { 
+            self::showError("E-mail não encontrado.");
+            exit;            
+        }
+
         // Obter o grupo
         $group = Group::findById($group_id);
         if (!$group) {
@@ -49,7 +56,7 @@ class GroupController extends BaseController
         }
 
         // Verificar se o usuário é participante do grupo
-        $participant = Participant::findByUserIdAndGroupId($user_id, $group_id);
+        $participant = Participant::findByUserEmailAndGroupId($email, $group_id);
         if (!$participant) {
             self::showError("Acesso negado. Apenas participantes do grupo podem acessar esta página.");
             exit;
@@ -148,13 +155,19 @@ class GroupController extends BaseController
             exit;
         }
 
-        $user_id = $_SESSION['user_id'];
         $group_id = $_POST['group_id'] ?? null;
 
-        // Verificar se o grupo existe e se o usuário é o criador
+        if (!$group_id) {
+            self::showError("ID do grupo não fornecido.");
+            exit;
+        }        
+
+         // Buscar o grupo
         $group = Group::findById($group_id);
-        if (!$group || $group['created_by'] != $user_id) {
-            self::showError("Acesso negado.");
+        
+        // Verificar se o grupo existe e se o usuário logado é o criador do grupo
+        if (!$group || $group['created_by'] != $_SESSION['user_id']) {
+            self::showError("Você não tem permissão para realizar o sorteio deste grupo.");
             exit;
         }
 
@@ -172,34 +185,17 @@ class GroupController extends BaseController
             exit;
         }
 
-        // Embaralhar a lista de participantes utilizando mt_rand()
+        // Usar o group_id e o timestamp atual para criar uma seed única
+        $seed = $group_id + time();
+        mt_srand($seed);
+
+        // Embaralhar a lista de participantes usando shuffle() com a seed
         $shuffled_participants = $participants;
-        usort($shuffled_participants, function () {
-            return mt_rand(-1, 1);
-        });
+        shuffle($shuffled_participants);
 
         // Validar se o sorteio é válido (ninguém tirou a si mesmo)
-        $max_attempts = 100;
-        $attempt = 0;
-        $valid_draw = false;
-
-        while (!$valid_draw && $attempt < $max_attempts) {
-            $attempt++;
-            usort($shuffled_participants, function () {
-                return mt_rand(-1, 1);
-            });
-
-            $valid_draw = true;
-            foreach ($participants as $index => $participant) {
-                if ($participant['id'] === $shuffled_participants[$index]['id']) {
-                    $valid_draw = false;
-                    break;
-                }
-            }
-        }
-
-        if (!$valid_draw) {
-            self::showError("Não foi possível realizar um sorteio válido. Tente novamente.");
+        while (!self::isValidDraw($participants, $shuffled_participants)) {
+            shuffle($shuffled_participants);
         }
 
         // Salvar o sorteio no banco de dados
@@ -213,4 +209,14 @@ class GroupController extends BaseController
         header("Location: /group/{$group_id}/settings");
         exit;
     }
+
+    private static function isValidDraw($original_ids, $shuffled_ids)
+    {
+        foreach ($original_ids as $index => $id) {
+            if ($id === $shuffled_ids[$index]) {
+                return false; // Sorteio inválido: alguém tirou a si mesmo
+            }
+        }
+        return true; // Sorteio válido
+    }    
 }

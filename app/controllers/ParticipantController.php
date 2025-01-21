@@ -31,15 +31,8 @@ class ParticipantController extends BaseController
             exit;
         }
 
-        // Verificar se já existe um usuário com esse e-mail
-        $existing_user = User::findByEmail($email);
-
         // Adicionar o participante com ou sem associação ao usuário
-        if ($existing_user) {
-            Participant::addToGroup($group_id, $name, $email, $existing_user['id']);
-        } else {
-            Participant::addToGroup($group_id, $name, $email, null);
-        }
+        Participant::addToGroup($group_id, $name, $email);
 
         header("Location: /group/{$group_id}/settings");
         exit;
@@ -64,12 +57,8 @@ class ParticipantController extends BaseController
              self::showError("Todos os campos são obrigatórios.");
          }
  
-         // Verificar se o e-mail pertence a um usuário já cadastrado
-         $user = User::findByEmail($email);
-         $user_id = $user ? $user['id'] : null;
- 
          // Atualizar o participante
-         Participant::updateParticipant($participant_id, $name, $email, $user_id);
+         Participant::updateParticipant($participant_id, $name, $email);
  
          // Redirecionar para a página de configurações do grupo
          header("Location: /group/$group_id/settings");

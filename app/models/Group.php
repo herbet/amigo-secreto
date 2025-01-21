@@ -37,7 +37,7 @@ class Group
     }
 
     // Buscar grupos nos quais um usuário está participando
-    public static function findGroupsByParticipant($user_id)
+    public static function findGroupsByParticipant($email)
     {
         $pdo = Database::connect();
         $stmt = $pdo->prepare("
@@ -45,9 +45,9 @@ class Group
             FROM `groups` g
             INNER JOIN `group_members` gm ON g.id = gm.group_id
             INNER JOIN `participants` p ON gm.participant_id = p.id
-            WHERE p.user_id = ?
+            WHERE p.email = ?
         ");
-        $stmt->execute([$user_id]);
+        $stmt->execute([$email]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 

@@ -77,7 +77,7 @@
     <!-- Botão para realizar o sorteio -->
     <?php if (!$group['draw_completed']): ?>
         <form action="/group/draw" method="POST">
-            <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
+            <input type="hidden" name="group_id" value="<?= htmlspecialchars($group['id']) ?>">
             <button type="submit" class="btn btn-success">Realizar Sorteio</button>
         </form>
     <?php else: ?>

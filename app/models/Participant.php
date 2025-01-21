@@ -31,31 +31,31 @@ class Participant
     }
 
     // Buscar participante pelo ID do usuário e ID do grupo
-    public static function findByUserIdAndGroupId($user_id, $group_id)
+    public static function findByUserEmailAndGroupId($email, $group_id)
     {
         $pdo = Database::connect();
         $stmt = $pdo->prepare("
             SELECT p.*
             FROM `participants` p
             INNER JOIN `group_members` gm ON p.id = gm.participant_id
-            WHERE p.user_id = ? AND gm.group_id = ?
+            WHERE p.email = ? AND gm.group_id = ?
         ");
-        $stmt->execute([$user_id, $group_id]);
+        $stmt->execute([$email, $group_id]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
     // Adicionar participante ao grupo
-    public static function addToGroup($group_id, $name, $email, $user_id = null)
+    public static function addToGroup($group_id, $name, $email)
     {
         $pdo = Database::connect();
 
         // Adicionar participante à tabela `participants` (se necessário)
         $stmt = $pdo->prepare("
-            INSERT INTO `participants` (name, email, user_id)
-            VALUES (?, ?, ?)
+            INSERT INTO `participants` (name, email)
+            VALUES (?, ?)
             ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)
         ");
-        $stmt->execute([$name, $email, $user_id]);
+        $stmt->execute([$name, $email]);
 
         // Obter o ID do participante
         $participant_id = $pdo->lastInsertId();
@@ -69,28 +69,16 @@ class Participant
     }
 
     // Atualizar informações de um participante
-    public static function updateParticipant($participant_id, $name, $email, $user_id = null)
+    public static function updateParticipant($participant_id, $name, $email)
     {
         $pdo = Database::connect();
         $stmt = $pdo->prepare("
             UPDATE `participants`
-            SET name = ?, email = ?, user_id = ?
+            SET name = ?, email = ?
             WHERE id = ?
         ");
-        $stmt->execute([$name, $email, $user_id, $participant_id]);
-    }
-
-    // Atualizar o user_id de um participante
-    public static function updateUserId($participant_id, $user_id)
-    {
-        $pdo = Database::connect();
-        $stmt = $pdo->prepare("
-            UPDATE `participants`
-            SET user_id = ?
-            WHERE id = ?
-        ");
-        $stmt->execute([$user_id, $participant_id]);
-    }    
+        $stmt->execute([$name, $email, $participant_id]);
+    }   
 
     // Excluir participante do grupo
     public static function deleteFromGroup($participant_id, $group_id)
@@ -103,23 +91,6 @@ class Participant
             WHERE group_id = ? AND participant_id = ?
         ");
         $stmt->execute([$group_id, $participant_id]);
-
-        // Verificar se o participante pertence a outros grupos
-        $stmt = $pdo->prepare("
-            SELECT COUNT(*)
-            FROM `group_members`
-            WHERE participant_id = ?
-        ");
-        $stmt->execute([$participant_id]);
-
-        // Se o participante não pertence a outros grupos, excluí-lo da tabela `participants`
-        if ($stmt->fetchColumn() == 0) {
-            $stmt = $pdo->prepare("
-                DELETE FROM `participants`
-                WHERE id = ?
-            ");
-            $stmt->execute([$participant_id]);
-        }
     }
 
     // Excluir todos os participantes associados a um grupo específico

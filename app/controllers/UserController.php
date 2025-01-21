@@ -97,13 +97,6 @@ class UserController extends BaseController
 
         $user_id = User::create($name, $email, $password);
 
-        // Verificar se o e-mail já existe na tabela `participants`
-        $participant = Participant::findByEmail($email);
-        if ($participant) {
-            // Relacionar o participante ao novo usuário criado
-            Participant::updateUserId($participant['id'], $user_id);
-        }
-
         // Login automático após registro
         $_SESSION['user_id'] = $user_id;
         $_SESSION['user_name'] = $name;
@@ -131,12 +124,18 @@ class UserController extends BaseController
         }
 
         $user_id = $_SESSION['user_id'];
+        // Busca informações do usuário
+        $email = User::findById($user_id)['email'];
+        if (!$email) { 
+            self::showError("E-mail não encontrado.");
+            exit;            
+        }
 
         // Buscar grupos criados pelo usuário
         $created_groups = Group::findByCreator($user_id);
 
         // Buscar grupos nos quais o usuário está participando
-        $participating_groups = Group::findGroupsByParticipant($user_id);
+        $participating_groups = Group::findGroupsByParticipant($email);
 
         include './app/views/dashboard.php';
     }
