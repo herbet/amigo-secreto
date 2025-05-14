@@ -109,17 +109,6 @@ class Group
         $stmt->execute([$group_id]);
     }
 
-    // Verificar se o sorteio é válido (ninguém tirou a si mesmo)
-    public static function isValidDraw($ids, $shuffled_ids)
-    {
-        foreach ($ids as $index => $id) {
-            if ($id == $shuffled_ids[$index]) {
-                return false; // Sorteio inválido
-            }
-        }
-        return true; // Sorteio válido
-    }
-
     // Obter o amigo secreto de um participante
     public static function getUserSecretFriend($group_id, $participant_id)
     {
