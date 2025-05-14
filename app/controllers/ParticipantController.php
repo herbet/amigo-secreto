@@ -24,10 +24,29 @@ class ParticipantController extends BaseController
             exit;
         }
 
+        // Verifica se o email é válido
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            self::showError("O email fornecido não é válido.");
+            exit;
+        }
+
+        // Verifica se o nome é válido
+        if (strlen($name) < 3 || strlen($name) > 50) {
+            self::showError("O nome deve ter entre 3 e 50 caracteres.");
+            exit;
+        }        
+
         // Verificar se o grupo existe e se o usuário é o criador
         $group = Group::findById($group_id);
         if (!$group || $group['created_by'] != $_SESSION['user_id']) {
             self::showError("Acesso negado.");
+            exit;
+        }
+
+        // Verifica se o participante já existe
+        $existingParticipant = Participant::findByEmail($email, $group_id);
+        if ($existingParticipant) {
+            self::showError("O participante já está associado a este grupo.", "/group/{$group_id}/settings");
             exit;
         }
 

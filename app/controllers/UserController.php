@@ -171,13 +171,13 @@ class UserController extends BaseController
         $confirm_password = $_POST['confirm_password'] ?? '';
 
         if (empty($name) || empty($email)) {
-            self::showError("Nome e e-mail são obrigatórios.");
+            self::showError("Nome e e-mail são obrigatórios.", "/profile");
             exit;
         }
 
         if (!empty($password) || !empty($confirm_password)) {
             if ($password !== $confirm_password) {
-                self::showError("As senhas não coincidem.");
+                self::showError("As senhas não coincidem.", "/profile");
                 exit;
             }
 
