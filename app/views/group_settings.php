@@ -18,7 +18,7 @@
                         <button class="btn btn-warning btn-sm me-1" onclick="showEditForm(<?= htmlspecialchars(json_encode($participant)) ?>)">Editar</button>
 
                         <!-- Botão de excluir -->
-                        <form action="/participant/delete" method="POST" style="display: inline;">
+                        <form action="/participant/delete" method="POST" style="display: inline;" onsubmit="return confirm('Tem certeza de que deseja excluir este participante? Esta ação não pode ser desfeita.');">
                             <input type="hidden" name="participant_id" value="<?= $participant['id'] ?>">
                             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
                             <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
@@ -60,7 +60,7 @@
     <!-- Mostrar o formulário de adicionar participante apenas se o sorteio ainda não foi realizado -->
     <?php if (!$group['draw_completed']): ?>
         <h3>Adicionar Participante</h3>
-        <form action="/group/addMember" method="POST" class="mb-3">
+        <form action="/participant/add" method="POST" class="mb-3">
             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
             <div class="mb-3">
                 <label for="name" class="form-label">Nome</label>
@@ -86,7 +86,7 @@
 
     <!-- Botão para excluir o grupo (apenas se o sorteio não foi realizado) -->
     <?php if (!$group['draw_completed']): ?>
-        <form action="/group/delete" method="POST" class="mt-4">
+        <form action="/group/delete" method="POST" class="mt-4" onsubmit="return confirm('Tem certeza de que deseja excluir este grupo? Esta ação não pode ser desfeita.');">
             <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
             <button type="submit" class="btn btn-danger">Excluir Grupo</button>
         </form>

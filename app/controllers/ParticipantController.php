@@ -44,7 +44,7 @@ class ParticipantController extends BaseController
         }
 
         // Verifica se o participante já existe
-        $existingParticipant = Participant::findByEmail($email, $group_id);
+        $existingParticipant = Participant::findByEmailAndGroupId($email, $group_id);
         if ($existingParticipant) {
             self::showError("O participante já está associado a este grupo.", "/group/{$group_id}/settings");
             exit;

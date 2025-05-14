@@ -68,13 +68,13 @@ if ($_SERVER['REQUEST_URI'] === '/profile' && $_SERVER['REQUEST_METHOD'] === 'PO
 
 // Página de criação de grupo
 if ($_SERVER['REQUEST_URI'] === '/group/create' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    GroupController::createForm();
+    GroupController::groupForm();
     exit;
 }
 
 // Processar criação de grupo
-if ($_SERVER['REQUEST_URI'] === '/group/create' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    GroupController::create();
+if ($_SERVER['REQUEST_URI'] === '/group/add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    GroupController::createGroup();
     exit;
 }
 
@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_URI'] === '/group/delete' && $_SERVER['REQUEST_METHOD'] ==
 // ----------------------
 
 // Adicionar participante
-if ($_SERVER['REQUEST_URI'] === '/group/addMember' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_URI'] === '/participant/add' && $_SERVER['REQUEST_METHOD'] === 'POST') {
     ParticipantController::addParticipant();
     exit;
 }

@@ -2,7 +2,7 @@
 
 <h2>Criar Novo Grupo</h2>
 
-<form action="/group/create" method="POST">
+<form action="/group/add" method="POST">
     <!-- Nome do Grupo -->
     <div class="mb-3">
         <label for="name" class="form-label">Nome do Grupo</label>

@@ -170,28 +170,41 @@ class UserController extends BaseController
         $password = $_POST['password'] ?? '';
         $confirm_password = $_POST['confirm_password'] ?? '';
 
+        // Verificar se o nome e o e-mail foram fornecidos
         if (empty($name) || empty($email)) {
             self::showError("Nome e e-mail são obrigatórios.", "/profile");
             exit;
         }
 
+        // Verificar se as senhas coincidem, caso tenham sido fornecidas
         if (!empty($password) || !empty($confirm_password)) {
             if ($password !== $confirm_password) {
                 self::showError("As senhas não coincidem.", "/profile");
                 exit;
             }
 
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            User::updateWithPassword($user_id, $name, $email, $hashed_password);
+            // Atualizar com nova senha
+            try {
+                User::updateWithPassword($user_id, $name, $email, $confirm_password);
+            } catch (Exception $e) {
+                self::showError("Erro ao atualizar o perfil: " . $e->getMessage(), "/profile");
+                exit;
+            }            
         } else {
-            User::updateWithoutPassword($user_id, $name, $email);
-        }
+            // Atualizar sem alterar a senha
+            try {
+                User::updateWithoutPassword($user_id, $name, $email);
+            } catch (Exception $e) {
+                self::showError("Erro ao atualizar o perfil: " . $e->getMessage(), "/profile");
+                exit;
+            }
+        }     
 
         // Atualizar a sessão com o novo nome
         $_SESSION['user_name'] = $name;
 
         // Definir mensagem de sucesso na sessão
-        $_SESSION['success_message'] = "Perfil atualizado com sucesso!";        
+        $_SESSION['success_message'] = "Perfil atualizado com sucesso!";
 
         header("Location: /profile");
         exit;

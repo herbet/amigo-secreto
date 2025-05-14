@@ -56,7 +56,7 @@ class GroupController extends BaseController
         }
 
         // Verificar se o usuário é participante do grupo
-        $participant = Participant::findByUserEmailAndGroupId($email, $group_id);
+        $participant = Participant::findByEmailAndGroupId($email, $group_id);
         if (!$participant) {
             self::showError("Acesso negado. Apenas participantes do grupo podem acessar esta página.");
             exit;
@@ -73,7 +73,7 @@ class GroupController extends BaseController
     }
 
     // Formulário para criar um grupo
-    public static function createForm()
+    public static function groupForm()
     {
         //session_start();
         if (!isset($_SESSION['user_id'])) {
@@ -86,7 +86,7 @@ class GroupController extends BaseController
     }
 
     // Criar um novo grupo
-    public static function create()
+    public static function createGroup()
     {
         //session_start();
         if (!isset($_SESSION['user_id'])) {
@@ -99,6 +99,16 @@ class GroupController extends BaseController
 
         if (empty($name)) {
             self::showError("O nome do grupo é obrigatório.");
+            exit;
+        }
+
+        if (strlen($name) < 3 || strlen($name) > 50) {
+            self::showError("O nome do grupo deve ter entre 3 e 50 caracteres.");
+            exit;
+        }
+
+        if (ctype_space($name)) {
+            self::showError("O nome do grupo não pode conter apenas espaços.");
             exit;
         }
 
@@ -181,7 +191,7 @@ class GroupController extends BaseController
         $participants = Group::getMembers($group_id);
         
         if (count($participants) < 2) {
-            self::showError("É necessário pelo menos dois participantes para realizar o sorteio.");
+            self::showError("É necessário pelo menos dois participantes para realizar o sorteio.", "/group/{$group_id}/settings");
             exit;
         }
 

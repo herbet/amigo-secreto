@@ -31,7 +31,7 @@ class Participant
     }
 
     // Buscar participante pelo ID do usuário e ID do grupo
-    public static function findByUserEmailAndGroupId($email, $group_id)
+    public static function findByEmailAndGroupId($email, $group_id)
     {
         $pdo = Database::connect();
         $stmt = $pdo->prepare("
