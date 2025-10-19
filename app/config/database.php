@@ -1,4 +1,5 @@
 <?php
+
 class Database {
     private static $host = 'db';
     private static $dbname = 'amigo_secreto';
@@ -16,6 +17,11 @@ class Database {
             }
         }
         return self::$pdo;
+    }
+
+    public static function disconnect()
+    {
+        self::$pdo = null;
     }
 }
 ?>

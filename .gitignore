@@ -1,3 +1,5 @@
 # Ignorar arquivos e diretórios gerados pelo Docker para o banco de dados
 db/data/
 db/logs/
+
+vendor/

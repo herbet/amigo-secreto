@@ -1,0 +1,22 @@
+db/data/
+db/amigo_secreto/
+db/mysql/
+db/performance_schema/
+db/sys/
+# Ignorar arquivos temporários e de configuração do banco
+*.dblwr
+*.pem
+*.ibd
+*.cnf
+*.pool
+*.1
+*.2
+*.index
+*.key
+*.cert
+*.sock
+undo_*
+#innodb_*
+# Ignorar diretórios ocultos, exceto .htaccess
+.*
+!.htaccess

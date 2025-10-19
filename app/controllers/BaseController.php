@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../helpers/MailHelper.php';
+
 class BaseController
 {
     // Função para exibir a página de erro

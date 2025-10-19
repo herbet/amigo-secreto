@@ -7,7 +7,7 @@ services:
       dockerfile: ./docker/Dockerfile
     container_name: amigo-secreto-php
     volumes:
-      - ./app:/var/www/html/app
+      - ./:/var/www/html
     ports:
       - "8080:80"
     networks:
@@ -39,6 +39,14 @@ services:
       PMA_PASSWORD: root
     ports:
       - "8081:80"
+    networks:
+      - amigo_secreto_network
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"  # Painel Web
+      - "1025:1025"  # Porta SMTP
     networks:
       - amigo_secreto_network
 

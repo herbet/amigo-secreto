@@ -210,7 +210,16 @@ class GroupController extends BaseController
 
         // Salvar o sorteio no banco de dados
         foreach ($participants as $index => $participant) {
-            Group::setSecretFriend($participant['id'], $shuffled_participants[$index]['id']);
+            $friendId = $shuffled_participants[$index]['id'];
+            Group::setSecretFriend($participant['id'], $friendId);
+
+            // Enviar e-mail com o amigo secreto
+            $friend = Participant::findById($friendId);
+            MailHelper::sendSecretFriendEmail(
+                $participant['email'],
+                $participant['name'],
+                $friend['name']
+            );            
         }
 
         // Marcar o sorteio como concluído
