@@ -114,4 +114,62 @@ class ParticipantController extends BaseController
         header("Location: /group/{$group_id}/settings");
         exit;
     }
+
+    public static function sendEmail()
+    {
+        // Verificar se o usuário está logado
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login");
+            exit;
+        }
+
+        // Obter os dados do formulário
+        $participant_id = $_POST['participant_id'] ?? null;
+        $group_id = $_POST['group_id'] ?? null;
+
+        if (!$participant_id || !$group_id) {
+            self::showError("Participante ou grupo inválido.");
+            exit;
+        }
+
+        // Verificar se o grupo existe e se o sorteio foi realizado
+        $group = Group::findById($group_id);
+        if (!$group || !$group['draw_completed']) {
+            self::showError("O sorteio ainda não foi realizado ou o grupo não existe.");
+            exit;
+        }
+
+        // Obter o participante e seu amigo secreto
+        $participant = Participant::findById($participant_id);
+        if (!$participant) {
+            self::showError("Participante não encontrado.");
+            exit;
+        }
+
+        // Obter informações sobre o amigo secreto
+        $secret_friend = null;
+        $secret_friend = Group::getUserSecretFriend($group_id, $participant_id);
+
+        if (!isset($secret_friend)) {
+            self::showError("O participante ainda não tem um amigo secreto atribuído.");
+            exit;
+        }
+
+        $friend = Participant::findById($secret_friend['id']);
+        if (!$friend) {
+            self::showError("Amigo secreto não encontrado para este participante.");
+            exit;
+        }
+
+        // Enviar o e-mail
+        MailHelper::sendSecretFriendEmail(
+            $participant['email'],
+            $participant['name'],
+            $friend['name']
+        );
+
+        // Notificar sucesso
+        self::showSuccess("E-mail enviado com sucesso para {$participant['name']}!", "/group/{$group_id}/settings");
+        exit;
+    }
 }

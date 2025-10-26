@@ -123,3 +123,9 @@ if ($_SERVER['REQUEST_URI'] === '/participant/delete' && $_SERVER['REQUEST_METHO
     ParticipantController::deleteParticipant();
     exit;
 }
+
+// Enviar e-mail individual do participante
+if ($_SERVER['REQUEST_URI'] === '/participant/send-email' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ParticipantController::sendEmail();
+    exit;
+}

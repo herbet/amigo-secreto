@@ -24,6 +24,13 @@
                             <button type="submit" class="btn btn-danger btn-sm">Excluir</button>
                         </form>
                     </div>
+                <?php else: ?>
+                    <!-- Botão para enviar e-mail individual -->
+                    <form action="/participant/send-email" method="POST" style="display: inline;">
+                        <input type="hidden" name="participant_id" value="<?= $participant['id'] ?>">
+                        <input type="hidden" name="group_id" value="<?= $group['id'] ?>">
+                        <button type="submit" class="btn btn-primary btn-sm">Reenviar Amigo Secreto</button>
+                    </form>
                 <?php endif; ?>
             </li>
         <?php endforeach; ?>
