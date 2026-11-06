@@ -18,9 +18,10 @@ Um sistema web simples para organizar e gerenciar **grupos de amigo secreto**, d
 
 ## 🚀 **Tecnologias Utilizadas**
 
-- **PHP 8.1**
-- **MySQL**
+- **PHP 8.3**
+- **MySQL 8**
 - **PhpMyAdmin**
+- **PHPMailer** (envio de e-mails) e **MailHog** (captura de e-mails em desenvolvimento)
 - **Bootstrap 5**
 - **Docker e Docker Compose**
 
@@ -41,29 +42,57 @@ Um sistema web simples para organizar e gerenciar **grupos de amigo secreto**, d
    cd amigo-secreto
    ```
 
-2. **Suba os containers com Docker Compose:**
+2. **Instale as dependências do Composer** (a pasta `vendor/` não é versionada e o Dockerfile não roda o Composer):
+
+   ```bash
+   composer install
+   ```
+
+   Sem o Composer instalado na máquina, dá para usar a imagem oficial:
+
+   ```bash
+   docker run --rm -v "$(pwd)":/app composer install
+   ```
+
+3. **Suba os containers com Docker Compose:**
 
    ```bash
    docker-compose up --build
    ```
 
-3. **Acesse o sistema no navegador:**
+4. **Acesse o sistema no navegador:**
 
    ```text
    http://localhost:8080
    ```
 
-4. **PhpMyAdmin:**
+5. **PhpMyAdmin:**
 
    ```text
    http://localhost:8081
+   ```
+
+6. **MailHog** (e-mails enviados pelo sorteio):
+
+   ```text
+   http://localhost:8025
    ```
 
 ---
 
 ## 🗃️ **Banco de Dados**
 
-As tabelas do banco de dados são geradas automaticamente quando o container MySQL é inicializado. Se precisar executar os scripts manualmente, eles estão no arquivo **`db/init.sql`**.
+O arquivo **`db/init.sql`** é montado em `/docker-entrypoint-initdb.d/` do container MySQL, então as tabelas são criadas automaticamente **na primeira inicialização**, quando a pasta `db/data/` ainda está vazia.
+
+Se o banco já tiver sido inicializado antes (a pasta `db/data/` já existe), o script não roda de novo. Nesse caso, você pode:
+
+- executar o script manualmente (só funciona se as tabelas ainda não existirem):
+
+  ```bash
+  docker exec -i amigo-secreto-db mysql -uroot -proot < db/init.sql
+  ```
+
+- ou zerar o banco (**apaga todos os dados**): pare os containers, remova a pasta `db/data/` e suba novamente.
 
 ---
 
@@ -77,7 +106,8 @@ Para facilitar o acesso inicial, você pode registrar um usuário diretamente pe
 
 Para colocar o sistema em produção, você precisará:
 
-1. Ajustar o arquivo **`config/database.php`** para apontar para um banco de dados de produção.
+1. Ajustar o arquivo **`app/config/database.php`** para apontar para um banco de dados de produção.
+2. Ajustar o arquivo **`app/helpers/MailHelper.php`** para usar um servidor SMTP real (hoje ele aponta para o MailHog).
 
 ---
 

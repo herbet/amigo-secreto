@@ -104,7 +104,7 @@ class ParticipantController extends BaseController
         // Verificar se o grupo existe e se o usuário é o criador
         $group = Group::findById($group_id);
         if (!$group || $group['created_by'] != $_SESSION['user_id']) {
-            self::showError("Acesso negado.");
+            self::showError("Grupo não encontrado ou você não tem permissão para excluir o participante.");
             exit;
         }
 
